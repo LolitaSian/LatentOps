@@ -3,46 +3,47 @@ Source code of paper: ***Composable Text Controls in Latent Space with ODEs***
 
 *https://arxiv.org/abs/2208.00638*
 
-
-***Code is coming soon...***
-
 ## Preparation
 ### Recommended Environment
-We recommend to create a new conda enviroment (named *latentops*) by:
+新建虚拟环境
 ```shell
-conda create -n latentops python==3.9.1 pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
+conda create -n latent python==3.9.1 pytorch==1.11.0 torchvision==0.12.0 torchaudio==0.11.0 cudatoolkit=11.3 -c pytorch
 ```
-Then activate *latentops* and install the required packages by running:
+激活虚拟环境，安装需要的包：
 ```shell
-conda activate latentops
+conda activate latent
 bash build_envs.sh
+# build_envs.sh修改过了
 ```
 
 ### Prepare Datasets
-Download and process the datasets by running the script:
+
+数据集处理：
 ```shell
 bash download_datasets.sh
 ```
 
 ### Pretrained Models
-Download and process the pretrained model by running the script:
+下载处理预训练模型：
+
 ```shell
 bash download_pretrained_models.sh
 ```
-    
+
 ### Prepare Classifiers
-Download and process the external classifiers by running the script:
+外部分类器：
  ```shell
  bash download_classifiers.sh
  ```
 ## Conditional Generation
-You can do conditional generation (default Yelp) by running:
+要进行条件生成（默认为Yelp），可以运行以下命令：
 ```shell
 cd code
 bash conditional_generation.sh $1 $2
 ```
-$1 represents operators (1 for sentiment, 4 for tense, 33 for formality).
-$2 represents desired labels:
+`$1` represents operators (1 for sentiment, 4 for tense, 33 for formality).
+`$2` represents desired labels:
+
 - sentiment: 0-negative, 1-positive
 - tense: 0-past, 1-present, 2-future
 - formality: 0-informal, 1-formal
@@ -60,86 +61,85 @@ bash conditional_generation.sh '1,4,33' '1,2,0'
 # for positive & future & informal and negative & future & informal
 bash conditional_generation.sh '1,4,33' '1,2,0;0,2,0'
 ```
-The generated files can be found in *../ckpts/model/sample/* (default: *../ckpts/large_yelp/sample/sampling\*.txt*)
+生成的文件可以在 *../ckpts/model/sample/* 目录中找到（默认为 *../ckpts/large_yelp/sample/sampling.txt*）。
 
 ## Train VAE
-Modify the path of data file in *code/train_vae.sh*
-```shell
-dataset=your_dataset_name
-# e.g., dataset=yelp
-TRAIN_FILE=path_to_train_data_file 
-# e.g., TRAIN_FILE=../data/datasets/yelp_data/train.shuf.merge
-TEST_FILE=path_to_test_data_file
-# e.g., TEST_FILE=../data/datasets/yelp_data/test.merge
-```
-The structure of the data file: one line one sentence. See *../data/datasets/yelp_data/test.merge* for example.
+要修改 *code/train_vae.sh* 脚本中的数据文件路径，请按照以下步骤进行操作：
 
-Then run the script to train a VAE
-```shell
-cd code
+```
+shellCopy codedataset=你的数据集名称
+# 例如，dataset=yelp
+TRAIN_FILE=数据训练文件路径 
+# 例如，TRAIN_FILE=../data/datasets/yelp_data/train.shuf.merge
+TEST_FILE=数据测试文件路径
+# 例如，TEST_FILE=../data/datasets/yelp_data/test.merge
+```
+
+数据文件的结构：每行一个句子。参考 *../data/datasets/yelp_data/test.merge* 示例文件。
+
+然后运行脚本来训练一个 VAE：
+
+```
+shellCopy codecd code
 bash train_vae.sh
 ```
-The checkpoints will be saved in *../ckpts/LM/$dataset/$name* by default. You also can find the tensorboard logs in *code/runs/$dataset*
+
+检查点默认保存在 *../ckpts/LM/$dataset/$name* 中。你还可以在 *code/runs/$dataset* 目录中找到 TensorBoard 日志。
+
+通过这些步骤，你可以在 *code/train_vae.sh* 脚本中修改数据文件的路径。请确保路径与你的数据文件的实际位置相匹配。
+
 ## Train GAN and Classifiers
-After training VAE, you can train the GAN and classifiers to do some operations.
+在训练完VAE之后，你可以训练GAN和分类器来执行一些操作。
 ### Train GAN
-You need to specify some key arguments: 
-```shell
-train_cls_gan='gan'
+你需要指定一些关键参数：
 
-ckpt_path=path_to_vae_ckpts  # e.g., ckpt_path=../ckpts/base_yelp
-
-TRAIN_FILE=path_to_test_gan_data_file 
-# e.g., TRAIN_FILE=../data/datasets/yelp_data/train_gan.txt
-
-TRAIN_FILE=path_to_test_gan_data_file 
-# e.g., TEST_FILE=../data/datasets/yelp_data/test.txt
 ```
-The GAN training and test data file should have the line format (exclude bracket []): [0]\t[text], where the [0] is not used and meaningless in the training and it can be any other integer. See the example in *../data/datasets/yelp_data/train_gan.txt*
+shellCopy codetrain_cls_gan='gan'
 
-Then run the below command to train GAN:
-```shell
-cd code
+ckpt_path=VAE检查点的路径  # 例如，ckpt_path=../ckpts/base_yelp
+
+TRAIN_FILE=训练GAN的数据文件路径 
+# 例如，TRAIN_FILE=../data/datasets/yelp_data/train_gan.txt
+
+TEST_FILE=测试GAN的数据文件路径 
+# 例如，TEST_FILE=../data/datasets/yelp_data/test.txt
+```
+
+GAN的训练和测试数据文件应该采用以下行格式（不包括方括号 []）：[0]\t[文本]，其中 [0] 在训练中没有使用且没有意义，可以是任何其他整数。参考 *../data/datasets/yelp_data/train_gan.txt* 中的示例。
+
+然后运行以下命令来训练GAN：
+
+```
+shellCopy codecd code
 bash train_classifier_latent.sh
-``` 
+```
+
 ### Train Classifiers
-You need to specify some key arguments: 
-```shell
-train_cls_gan='cls'
 
-ckpt_path=path_to_vae_ckpts  # e.g., ckpt_path=../ckpts/base_yelp
+你需要指定一些关键参数：
 
-TRAIN_FILE=path_to_test_cls_data_file 
-# e.g., TRAIN_FILE=../data/datasets/yelp_data/train_sentiment.txt
-
-TRAIN_FILE=path_to_test_cls_data_file 
-# e.g., TEST_FILE=../data/datasets/yelp_data/test_sentiment.txt
-
-cls_step=identifier_of_classifier
-# identifier of this classifier, the classifier will be stored in path_to_vae_ckpts/checkpoint-cls-1 if cls_step=1
-
-n_classes=number_of_classes
-# number of classes,  e.g., if it contains 2 classes, n_classes=2
 ```
-The Classifiers training and test data file should have the line format (exclude bracket []):[class_label]\t[text], where [class_label] should be the class label of the text, it should be a integer. If you have 2 classes, the [class_label] should be 0 or 1. If you have 3 classes, it should be 0, 1, or 2. See *../data/datasets/yelp_data/train_sentiment.txt* for example.
+shellCopy codetrain_cls_gan='gan'
 
-Then run the below command to train Classifiers:
-```shell
-cd code
+ckpt_path=VAE检查点的路径  # 例如，ckpt_path=../ckpts/base_yelp
+
+TRAIN_FILE=训练GAN的数据文件路径 
+# 例如，TRAIN_FILE=../data/datasets/yelp_data/train_gan.txt
+
+TEST_FILE=测试GAN的数据文件路径 
+# 例如，TEST_FILE=../data/datasets/yelp_data/test.txt
+```
+
+GAN的训练和测试数据文件应该采用以下行格式（不包括方括号 []）：[0]\t[文本]，其中 [0] 在训练中没有使用且没有意义，可以是任何其他整数。请参考 *../data/datasets/yelp_data/train_gan.txt* 中的示例。
+
+然后运行以下命令来训练GAN：
+
+```
+shellCopy codecd code
 bash train_classifier_latent.sh
-``` 
+```
+
 
 ## Outputs
-To facilitate comparison, we provide the output files of text editing with single attribute (text style transfer) in [*./outputs*](/outputs) folder.
-
-
-## Cite
-```
-@article{liu2022composable,
-    title={Composable Text Control Operations in Latent Space with Ordinary Differential Equations},
-    author={Liu, Guangyi and Feng, Zeyu and Gao, Yuan and Yang, Zichao and Liang, Xiaodan and Bao, Junwei and He, Xiaodong and Cui, Shuguang and Li, Zhen and Hu, Zhiting},
-    journal={arXiv preprint arXiv:2208.00638},
-    year={2022}
-}
-```
+为了方便比较，我们在 [*./outputs*](https://chat.openai.com/outputs) 文件夹中提供了进行单属性文本编辑（文本风格转换）的输出文件。
 

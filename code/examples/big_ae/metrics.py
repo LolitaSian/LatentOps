@@ -3,14 +3,16 @@ from multiprocessing import Pool
 import pdb
 import numpy as np
 import nltk
+
 nltk.download('punkt')
 
 from nltk.translate.bleu_score import SmoothingFunction
 
-try: 
+try:
     from multiprocessing import cpu_count
-except: 
+except:
     from os import cpu_count
+
 
 class Metrics(object):
     def __init__(self):
@@ -37,7 +39,6 @@ class Bleu(Metrics):
         self.reference = None
         self.is_first = True
         self.num_sentences = num_fake_sentences
-
 
     def get_name(self):
         return self.name
@@ -97,21 +98,19 @@ class Bleu(Metrics):
         maxx = self.num_sentences
         with open(self.test_data) as test_data:
             for i, hypothesis in enumerate(test_data):
-                #print('i : {}'.format(i))
+                # print('i : {}'.format(i))
                 hypothesis = nltk.word_tokenize(hypothesis)
                 result.append(pool.apply_async(self.calc_bleu, args=(reference, hypothesis, weight)))
-                if i > maxx : break
+                if i > maxx: break
         score = 0.0
         cnt = 0
         for it, i in enumerate(result):
-            #print('i : {}'.format(it))
+            # print('i : {}'.format(it))
             score += i.get()
             cnt += 1
         pool.close()
         pool.join()
         return score / cnt
-
-
 
 
 class SelfBleu(Metrics):
@@ -123,7 +122,6 @@ class SelfBleu(Metrics):
         self.sample_size = num_sentences
         self.reference = None
         self.is_first = True
-
 
     def get_name(self):
         return self.name
@@ -181,9 +179,9 @@ class SelfBleu(Metrics):
         result = list()
         sentence_num = len(reference)
         for index in range(sentence_num):
-            #genious:
+            # genious:
             hypothesis = reference[index]
-            other = reference[:index] + reference[index+1:]
+            other = reference[:index] + reference[index + 1:]
             result.append(pool.apply_async(self.calc_bleu, args=(other, hypothesis, weight)))
 
         score = 0.0
