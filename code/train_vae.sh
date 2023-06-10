@@ -2,7 +2,7 @@
 export PYTHONPATH="${PYTHONPATH}:/workspace/code"
 
 dataset=yelp
-cuda=0
+cuda=1
 #export TRAIN_FILE=../data/datasets/amazon_data/train.shuf.merge
 #export TEST_FILE=../data/datasets/amazon_data/test.merge
 TRAIN_FILE=../data/datasets/yelp_data/train.shuf.merge
@@ -63,7 +63,8 @@ else
 fi
 
 name='v8_'$model's_'$gpt_size'_'$prefix'_fx'$fix_model'_'$latent_size'_'b$batch'_'e$epoch'_d'$dim_target_kl #'_d'$dim_target_kl'_lr'$learning_rate
-CUDA_VISIBLE_DEVICES=$cuda python examples/big_ae/run_lm_vae_training.py \
+# CUDA_VISIBLE_DEVICES=$cuda python examples/big_ae/run_lm_vae_training.py \
+CUDA_VISIBLE_DEVICES=$cuda TRANSFORMERS_OFFLINE=1 python examples/big_ae/run_lm_vae_training.py \
     --output_dir=../ckpts/LM/$dataset/$name  \
     --dataset $dataset \
     --encoder_model_type=$model \

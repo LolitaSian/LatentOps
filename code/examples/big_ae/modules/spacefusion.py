@@ -34,7 +34,7 @@ class SpaceFusion(VAE):
         speaker = np.zeros((N, T))
         sep = ids == self.ix_turn_sep
         for i in range(N):
-            is_B = False    # start with speake r A
+            is_B = False    # start with speaker A
             for t in range(T):
                 speaker[i,t] = int(is_B)
                 if sep[i,t].item():

@@ -3,7 +3,7 @@ export PYTHONPATH="${PYTHONPATH}:/workspace/code"
 weight_energy=1
 gpt_size='large'
 data_type='sentiment' 
-name='large_yelp'
+name='result'
 
 
 latent_size=64
@@ -32,7 +32,7 @@ fi
 cls_step=$1
 att_val_list=$2
 
-cuda='0' #$3
+cuda='4' #$3
 
 echo "cls: $cls_step"
 
@@ -44,7 +44,8 @@ else
   echo "False"
 fi
 
-CUDA_VISIBLE_DEVICES=$cuda python examples/big_ae/conditional_generation.py \
+# CUDA_VISIBLE_DEVICES=$cuda \python examples/big_ae/conditional_generation.py \
+CUDA_VISIBLE_DEVICES=$cuda TRANSFORMERS_OFFLINE=1 \python examples/big_ae/conditional_generation.py \
     --output_dir=../ckpts/$name  \
     --encoder_model_type=bertu \
     --encoder_model_name_or_path=prajjwal1/bert-small \

@@ -5,3 +5,4 @@ tar -zxvf datasets.tar.gz
 cd ..
 
 echo "Datasets are in ./data/datasets"
+

@@ -49,20 +49,11 @@ from nltk.translate.bleu_score import corpus_bleu
 from torchdiffeq import odeint_adjoint
 from torchdiffeq import odeint as odeint_normal
 
-# from pytorch_transformers import (WEIGHTS_NAME, AdamW, WarmupLinearSchedule,
-#                                   BertConfig, BertForLatentConnector, BertTokenizer,
-#                                   GPT2Config, GPT2ForLatentConnector, GPT2Tokenizer,
-#                                   OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
-#                                   RobertaConfig, RobertaForMaskedLM, RobertaTokenizer)
-
-from transformers import (WEIGHTS_NAME, AdamW, WarmupLinearSchedule,
+from pytorch_transformers import (WEIGHTS_NAME, AdamW, WarmupLinearSchedule,
                                   BertConfig, BertForLatentConnector, BertTokenizer,
                                   GPT2Config, GPT2ForLatentConnector, GPT2Tokenizer,
                                   OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
                                   RobertaConfig, RobertaForMaskedLM, RobertaTokenizer)
-
-
-
 
 from utils_eval import (weight_init, calc_iwnll, calc_rec, calc_mi, calc_au, BucketingDataLoader, TextDataset_Split,
                         TextDataset_2Tokenizers, frange_cycle_linear, frange_cycle_zero_linear)
